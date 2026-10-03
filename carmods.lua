@@ -1,5 +1,11 @@
 repeat task.wait() until getgenv().JHK and getgenv().JHK.Addons
 
+if getgenv().CarModsLoaded then
+    JHK:Notify("Car Mods", "Already loaded", 3, "small", "bell")
+    return
+end
+getgenv().CarModsLoaded = true
+
 local players = game:GetService("Players")
 local runService = game:GetService("RunService")
 local userInputService = game:GetService("UserInputService")
@@ -250,9 +256,6 @@ local carBounceSpeed = 0.5
 local carBounceStart = 0
 local deadDrive = false
 local invertWheelSpeed = false
-local earRapePlayer = false
-local earRapePlayerSelected = nil
-local earRapePlayerAllWheels = false
 
 local function disableSprings(car)
     savedSprings = {}
@@ -597,6 +600,7 @@ Section:AddToggle({
 
 Section:AddButton({
     Name = "Fix Car (Mod Shop)",
+    Icon = "gear",
     Callback = function()
         if not Functions.isDriving() or not Functions.isPlayerInOwnCar() then
             JHK:Notify("Car Mods", "Must be driving your own car", 3, "small", "bell")
@@ -645,6 +649,7 @@ Section:AddToggle({
 
 Section:AddButton({
     Name = "Drive Upside Down",
+    Icon = "two-carets-bar-vertical-flip",
     Callback = function()
         if not Functions.isDriving() then return end
         local car = Functions.getPlayerCar()
@@ -683,6 +688,7 @@ Section:AddButton({
 
 Section:AddButton({
     Name = "Swap Front/Rear Wheels",
+    Icon = "arrow-rotate-right",
     Callback = function()
         if not Functions.isPlayerInOwnCar() then return end
         local car = Functions.getPlayerCar()
@@ -704,6 +710,7 @@ Section:AddButton({
 
 Section:AddButton({
     Name = "Make Threewheeler",
+    Icon = "two-carets-bar-horizontal-flip",
     Callback = function()
         if not Functions.isDriving() then return end
         local car = Functions.getPlayerCar()
@@ -718,6 +725,7 @@ Section:AddButton({
 
 Section:AddButton({
     Name = "Toggle Weightless",
+    Icon = "arrow-large-up",
     Callback = function()
         if not Functions.isDriving() then return end
         local car = Functions.getPlayerCar()
@@ -730,6 +738,7 @@ Section:AddButton({
 
 Section:AddButton({
     Name = "Invert Steering",
+    Icon = "arrow-rotate-right",
     Callback = function()
         Functions.invertSteering()
     end
@@ -737,6 +746,7 @@ Section:AddButton({
 
 Section:AddButton({
     Name = "Flip Car",
+    Icon = "two-carets-bar-vertical-flip",
     Callback = function()
         if not Functions.isDriving() then return end
         local car = Functions.getPlayerCar()
@@ -819,4 +829,4 @@ runService.Heartbeat:Connect(function(dt)
     end
 end)
 
-JHK:Notify("Car Mods", "Car Mods addon loaded", 4, "small", "car")
+JHK:Notify("Car Mods", "Car Mods addon loaded", 4, "small", "paper-airplane")
