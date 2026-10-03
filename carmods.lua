@@ -1,4 +1,4 @@
-# Full crеdits to adam (_blahaj) from ЕRХ
+-- Full crеdits to adam (_blahaj) from ЕRХ
 repeat task.wait() until getgenv().JHK and getgenv().JHK.Addons
 
 if getgenv().CarModsLoaded then
