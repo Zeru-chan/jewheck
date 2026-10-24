@@ -1,12 +1,10 @@
--- Full crеdits to adam (_blahaj) from ЕRХ
+-- Full credits to adam (_blahaj) from ERX
 repeat task.wait() until getgenv().JHK and getgenv().JHK.Addons
-
 if getgenv().CarModsLoaded then
     JHK:Notify("Car Mods", "Already loaded", 3, "small", "bell")
     return
 end
 getgenv().CarModsLoaded = true
-
 local players = game:GetService("Players")
 local runService = game:GetService("RunService")
 local userInputService = game:GetService("UserInputService")
@@ -14,13 +12,10 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local lighting = game:GetService("Lighting")
 local guiService = game:GetService("GuiService")
 local lp = players.LocalPlayer
-
 local Functions = {}
-
 Functions.getChar = function()
     return lp.Character or lp.CharacterAdded:Wait()
 end
-
 Functions.getPlayerCar = function()
     local char = Functions.getChar()
     if char and char:FindFirstChild("Humanoid") and char.Humanoid.SeatPart then
@@ -45,7 +40,6 @@ Functions.getPlayerCar = function()
     end
     return JHK:OwnedCar() or JHK:OwnedATV()
 end
-
 Functions.isPlayerInOwnCar = function()
     local char = Functions.getChar()
     if not char or not char:FindFirstChild("Humanoid") then return false end
@@ -55,11 +49,9 @@ Functions.isPlayerInOwnCar = function()
     end
     return false
 end
-
 Functions.isDriving = function()
     return JHK:IsDriving()
 end
-
 Functions.togglePlayerCar = function(status)
     local gameGui = lp.PlayerGui:FindFirstChild("GameGui")
     if not gameGui then return false end
@@ -72,7 +64,6 @@ Functions.togglePlayerCar = function(status)
     end
     return false
 end
-
 Functions.getController = function()
     local car = Functions.getPlayerCar()
     if not car then return nil end
@@ -81,7 +72,6 @@ Functions.getController = function()
     local ok, ctrl = pcall(require, module)
     return ok and ctrl or nil
 end
-
 local weights, saved, weightsCar = {}, {}, nil
 Functions.makeWeightlessCar = function(toggle)
     local car = Functions.getPlayerCar()
@@ -114,7 +104,6 @@ Functions.makeWeightlessCar = function(toggle)
     end
     return true
 end
-
 Functions.applyCamber = function(wheel, camber)
     if not wheel:FindFirstChild("AxleP") then return end
     local sideLetter = string.sub(wheel.Name, 2, 2)
@@ -130,7 +119,6 @@ Functions.applyCamber = function(wheel, camber)
     aa.Axis = newAxis
     ba.Axis = newAxis
 end
-
 local weldCache = {}
 local function ensureCache(wheel)
     local cached = weldCache[wheel]
@@ -162,7 +150,6 @@ local function ensureCache(wheel)
     end
     return cached
 end
-
 Functions.applyAxleOffset = function(wheel, offsets)
     local cached = ensureCache(wheel)
     if not cached then return end
@@ -175,7 +162,6 @@ Functions.applyAxleOffset = function(wheel, offsets)
     local newLocal = cached.origLocal + delta
     cached.weld.C1 = newLocal:Inverse() * cached.weld.C0
 end
-
 Functions.setWheelWorldPosition = function(wheel, worldPosition)
     local cached = ensureCache(wheel)
     if not cached then return end
@@ -186,7 +172,6 @@ Functions.setWheelWorldPosition = function(wheel, worldPosition)
     local targetWorld = CFrame.new(worldPosition)
     cached.weld.C1 = targetWorld:Inverse() * seat.CFrame * cached.weld.C0
 end
-
 local steeringInverted, steeringInvertedCar = false, nil
 Functions.invertSteering = function()
     if not Functions.isDriving() then return end
@@ -227,7 +212,6 @@ Functions.invertSteering = function()
     end
     steeringInverted = not steeringInverted
 end
-
 local speed = 200
 local multiplier = 2
 local keys = { W = false, A = false, S = false, D = false, Q = false, E = false, LeftShift = false }
@@ -257,7 +241,6 @@ local carBounceSpeed = 0.5
 local carBounceStart = 0
 local deadDrive = false
 local invertWheelSpeed = false
-
 local function disableSprings(car)
     savedSprings = {}
     if not car or not car:FindFirstChild("Wheels") then return end
@@ -270,14 +253,12 @@ local function disableSprings(car)
         end
     end
 end
-
 local function restoreSprings()
     for sp, was in pairs(savedSprings) do
         pcall(function() sp.Enabled = was end)
     end
     savedSprings = {}
 end
-
 local function orbitWheels(dt)
     local car = Functions.getPlayerCar()
     if not car or not Functions.isPlayerInOwnCar() then return end
@@ -295,7 +276,6 @@ local function orbitWheels(dt)
     end
     angle = angle + angleSpeed * dt
 end
-
 local function controlledFly(dt)
     local car = Functions.getPlayerCar()
     if not car then return end
@@ -360,7 +340,6 @@ local function controlledFly(dt)
         car:PivotTo(newPos)
     end
 end
-
 local function carBounce(dt)
     local car = Functions.getPlayerCar()
     if not car or not Functions.isPlayerInOwnCar() or not car:FindFirstChild("Wheels") then return end
@@ -375,7 +354,6 @@ local function carBounce(dt)
         end
     end
 end
-
 local function cleanupInvertConns()
     for _, data in pairs(invertConns) do
         if data.conn then data.conn:Disconnect() end
@@ -383,7 +361,6 @@ local function cleanupInvertConns()
     invertConns = {}
     invertCar = nil
 end
-
 local function setupInvertForCar()
     cleanupInvertConns()
     local car = Functions.getPlayerCar()
@@ -405,9 +382,7 @@ local function setupInvertForCar()
         end
     end
 end
-
 local Section = JHK:AddSection("Car Mods", "left")
-
 Section:AddLabel("Car Fly"):AddToggle({
     Default = false,
     Flag = "carFlyEnabled",
@@ -431,7 +406,6 @@ Section:AddLabel("Car Fly"):AddToggle({
     Mode = "Toggle",
     Flag = "carFlyKeybind"
 })
-
 Section:AddSlider({
     Text = "Fly Speed",
     Default = 200,
@@ -441,7 +415,6 @@ Section:AddSlider({
     Flag = "carFlySpeed",
     Callback = function(v) speed = v end
 })
-
 Section:AddSlider({
     Text = "Fly Boost Multiplier (Shift)",
     Default = 2,
@@ -451,13 +424,11 @@ Section:AddSlider({
     Flag = "carFlyBoost",
     Callback = function(v) multiplier = v end
 })
-
-Section:AddToggle({
+Section:AddLabel("Helicopter Mode"):AddToggle({
     Default = true,
     Flag = "helicopterMode",
     Callback = function(state) HelicopterFly = state end
 })
-
 Section:AddSlider({
     Text = "Helicopter Distance",
     Default = 10,
@@ -467,7 +438,6 @@ Section:AddSlider({
     Flag = "helicopterDistance",
     Callback = function(v) helicopterDistance = v end
 })
-
 Section:AddSlider({
     Text = "Helicopter Height",
     Default = 10,
@@ -477,21 +447,16 @@ Section:AddSlider({
     Flag = "helicopterHeight",
     Callback = function(v) helicopterHeight = v end
 })
-
-Section:AddLabel("Bounce")
-
-Section:AddToggle({
+Section:AddLabel("Bounce"):AddToggle({
     Default = false,
     Flag = "carBounceEnabled",
     Callback = function(state) carBounceEnabled = state end
 })
-
-Section:AddToggle({
+Section:AddLabel("Bounce Inverted"):AddToggle({
     Default = false,
     Flag = "carBounceInverted",
     Callback = function(state) carBounceInverted = state end
 })
-
 Section:AddSlider({
     Text = "Bounce Height",
     Default = 3,
@@ -501,7 +466,6 @@ Section:AddSlider({
     Flag = "carBounceHeight",
     Callback = function(v) carBounceHeight = v end
 })
-
 Section:AddSlider({
     Text = "Bounce Speed",
     Default = 0.5,
@@ -511,7 +475,6 @@ Section:AddSlider({
     Flag = "carBounceSpeed",
     Callback = function(v) carBounceSpeed = v end
 })
-
 Section:AddSlider({
     Text = "Bounce Start Height",
     Default = 0,
@@ -521,9 +484,7 @@ Section:AddSlider({
     Flag = "carBounceStart",
     Callback = function(v) carBounceStart = v end
 })
-
 Section:AddLabel("Wheel Mods")
-
 Section:AddSlider({
     Text = "Camber",
     Default = 0,
@@ -539,7 +500,6 @@ Section:AddSlider({
         end
     end
 })
-
 Section:AddSlider({
     Text = "Ride Height",
     Default = 0,
@@ -555,7 +515,6 @@ Section:AddSlider({
         end
     end
 })
-
 Section:AddSlider({
     Text = "Wheel Width",
     Default = 0,
@@ -571,7 +530,6 @@ Section:AddSlider({
         end
     end
 })
-
 for _, side in ipairs({"FL", "FR", "RL", "RR"}) do
     Section:AddSlider({
         Text = "Ride Height " .. side,
@@ -590,15 +548,12 @@ for _, side in ipairs({"FL", "FR", "RL", "RR"}) do
         end
     })
 end
-
 Section:AddLabel("Utility")
-
-Section:AddToggle({
+Section:AddLabel("Dead Drive"):AddToggle({
     Default = false,
     Flag = "deadDrive",
     Callback = function(state) deadDrive = state end
 })
-
 Section:AddButton({
     Name = "Fix Car (Mod Shop)",
     Icon = "gear",
@@ -631,10 +586,8 @@ Section:AddButton({
         end)
     end
 })
-
 Section:AddLabel("Trolling / Fun")
-
-Section:AddToggle({
+Section:AddLabel("Invert Wheel Speed"):AddToggle({
     Default = false,
     Flag = "invertWheelSpeed",
     Callback = function(state)
@@ -647,7 +600,6 @@ Section:AddToggle({
         end
     end
 })
-
 Section:AddButton({
     Name = "Drive Upside Down",
     Icon = "two-carets-bar-vertical-flip",
@@ -655,28 +607,46 @@ Section:AddButton({
         if not Functions.isDriving() then return end
         local car = Functions.getPlayerCar()
         if not car then return end
-        local pos = car:GetPivot() * CFrame.new(0, 22, 0) * CFrame.Angles(0, math.pi, math.pi)
+
+        -- Make weightless + disable springs so physics stop fighting the flip
         Functions.makeWeightlessCar(true)
+        disableSprings(car)
+
         if car:FindFirstChild("Wheels") then
             for _, wheel in car.Wheels:GetChildren() do
+                weldCache[wheel] = nil          -- clear cache so offsets are calculated on the new orientation
                 wheel.CanCollide = false
             end
         end
+
+        -- Clean 180° roll + raise so the car is properly inverted
+        local current = car:GetPivot()
+        local pos = current * CFrame.new(0, 14, 0) * CFrame.Angles(0, 0, math.pi)
         car:PivotTo(pos)
+
+        -- Push wheels out a reasonable amount for the inverted state
         if car:FindFirstChild("Wheels") then
             for _, wheel in car.Wheels:GetChildren() do
-                Functions.applyAxleOffset(wheel, {Y = 15})
+                Functions.applyAxleOffset(wheel, {Y = 12})
             end
         end
-        for _ = 1, 120 do
+
+        -- Short stabilization (zeros velocity so it doesn't bounce/spin)
+        for _ = 1, 25 do
+            if car.PrimaryPart then
+                car.PrimaryPart.AssemblyLinearVelocity = Vector3.zero
+                car.PrimaryPart.AssemblyAngularVelocity = Vector3.zero
+            end
             car:PivotTo(pos)
             task.wait()
         end
+
         if car:FindFirstChild("Wheels") then
             for _, wheel in car.Wheels:GetChildren() do
                 wheel.CanCollide = true
             end
         end
+
         workspace.CurrentCamera.CameraSubject = Functions.getChar()
         pcall(function()
             replicatedStorage:WaitForChild("FE"):WaitForChild("ChangeClientSetting"):InvokeServer("AutoCarFlipSetting", false)
@@ -686,7 +656,6 @@ Section:AddButton({
         setupInvertForCar()
     end
 })
-
 Section:AddButton({
     Name = "Swap Front/Rear Wheels",
     Icon = "arrow-rotate-right",
@@ -708,7 +677,6 @@ Section:AddButton({
         car:PivotTo(pos)
     end
 })
-
 Section:AddButton({
     Name = "Make Threewheeler",
     Icon = "two-carets-bar-horizontal-flip",
@@ -723,7 +691,6 @@ Section:AddButton({
         end
     end
 })
-
 Section:AddButton({
     Name = "Toggle Weightless",
     Icon = "arrow-large-up",
@@ -736,7 +703,6 @@ Section:AddButton({
         JHK:Notify("Car Mods", currently and "Weight restored" or "Car is now weightless", 2, "small", "bell")
     end
 })
-
 Section:AddButton({
     Name = "Invert Steering",
     Icon = "arrow-rotate-right",
@@ -744,7 +710,6 @@ Section:AddButton({
         Functions.invertSteering()
     end
 })
-
 Section:AddButton({
     Name = "Flip Car",
     Icon = "two-carets-bar-vertical-flip",
@@ -757,21 +722,17 @@ Section:AddButton({
         car:PivotTo(CFrame.new(newPos) * (pivot - pivot.Position) * CFrame.Angles(0, 0, math.pi))
     end
 })
-
 userInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     local key = input.KeyCode.Name
     if keys[key] ~= nil then keys[key] = true end
 end)
-
 userInputService.InputEnded:Connect(function(input)
     local key = input.KeyCode.Name
     if keys[key] ~= nil then keys[key] = false end
 end)
-
 local lastDriving = 0
 local debounce = false
-
 runService.Heartbeat:Connect(function()
     local char = Functions.getChar()
     local car = Functions.getPlayerCar()
@@ -808,7 +769,6 @@ runService.Heartbeat:Connect(function()
         end)
     end
 end)
-
 runService.Heartbeat:Connect(function()
     if not invertWheelSpeed then return end
     local car = Functions.getPlayerCar()
@@ -820,7 +780,6 @@ runService.Heartbeat:Connect(function()
         end
     end
 end)
-
 runService.Heartbeat:Connect(function(dt)
     if carFlyEnabled then
         controlledFly(dt)
@@ -829,5 +788,4 @@ runService.Heartbeat:Connect(function(dt)
         carBounce(dt)
     end
 end)
-
 JHK:Notify("Car Mods", "Car Mods addon loaded", 4, "small", "paper-airplane")
